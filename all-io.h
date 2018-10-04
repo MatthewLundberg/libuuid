@@ -10,10 +10,16 @@
 #define UTIL_LINUX_ALL_IO_H
 
 #include <string.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 #include <errno.h>
 
 #include "c.h"
+
+#ifndef HAVE_SSIZE_T
+typedef intptr_t ssize_t;
+#endif
 
 static inline int write_all(int fd, const void *buf, size_t count)
 {

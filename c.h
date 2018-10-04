@@ -21,7 +21,10 @@
 #endif
 
 #include <stdio.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -188,19 +191,19 @@ errmsg(char doexit, int excode, char adderr, const char *fmt, ...)
 }
 
 #ifndef HAVE_ERR
-# define err(E, FMT...) errmsg(1, E, 1, FMT)
+# define err(E, FMT, ...) errmsg(1, E, 1, FMT)
 #endif
 
 #ifndef HAVE_ERRX
-# define errx(E, FMT...) errmsg(1, E, 0, FMT)
+# define errx(E, FMT, ...) errmsg(1, E, 0, FMT)
 #endif
 
 #ifndef HAVE_WARN
-# define warn(FMT...) errmsg(0, 0, 1, FMT)
+# define warn(FMT, ...) errmsg(0, 0, 1, FMT)
 #endif
 
 #ifndef HAVE_WARNX
-# define warnx(FMT...) errmsg(0, 0, 0, FMT)
+# define warnx(FMT, ...) errmsg(0, 0, 0, FMT)
 #endif
 #endif /* !HAVE_ERR_H */
 
@@ -268,6 +271,7 @@ static inline size_t get_hostname_max(void)
 }
 
 #ifndef HAVE_USLEEP
+#ifndef _WIN32
 /*
  * This function is marked obsolete in POSIX.1-2001 and removed in
  * POSIX.1-2008. It is replaced with nanosleep().
@@ -280,6 +284,13 @@ static inline int usleep(useconds_t usec)
 	};
 	return nanosleep(&waittime, NULL);
 }
+#else
+static inline int usleep(int usec)
+{
+    Sleep(usec/1000);
+    return 0;
+}
+#endif
 #endif
 
 /*

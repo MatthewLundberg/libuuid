@@ -273,14 +273,20 @@ static int get_clock(uint32_t *clock_high, uint32_t *clock_low,
 	THREAD_LOCAL uint16_t		clock_seq;
 	struct timeval			tv;
 	uint64_t			clock_reg;
+#ifdef HAVE_MODE_T
 	mode_t				save_umask;
+#endif
 	int				len;
 	int				ret = 0;
 
 	if (state_fd == -2) {
+#ifdef HAVE_MODE_T
 		save_umask = umask(0);
+#endif
 		state_fd = open(LIBUUID_CLOCK_FILE, O_RDWR|O_CREAT|O_CLOEXEC, 0660);
+#ifdef HAVE_MODE_T
 		(void) umask(save_umask);
+#endif
 		if (state_fd != -1) {
 			state_f = fdopen(state_fd, "r+" UL_CLOEXECSTR);
 			if (!state_f) {

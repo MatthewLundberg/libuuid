@@ -7,13 +7,23 @@
  * GNU Lesser General Public License.
  */
 #include <stdio.h>
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
+
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
+#endif
 
+#ifdef HAVE_SYS_SYSCALL_H
 #include <sys/syscall.h>
+#endif
 
 #include "randutils.h"
 
@@ -28,8 +38,15 @@
 THREAD_LOCAL unsigned short ul_jrand_seed[3];
 #endif
 
+#ifndef HAVE_SSIZE_T
+typedef intptr_t ssize_t;
+#endif
+
 int random_get_fd(void)
 {
+#ifdef _WIN32
+    return -1;
+#else
 	int i, fd;
 	struct timeval	tv;
 
@@ -54,6 +71,7 @@ int random_get_fd(void)
 	for (i = (tv.tv_sec ^ tv.tv_usec) & 0x1F; i > 0; i--)
 		rand();
 	return fd;
+#endif
 }
 
 
